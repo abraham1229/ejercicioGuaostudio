@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createAccount, getUser, initiateTransaction, login } from "./handlers";
+import { createAccount, getUser, initiateTransaction, login, validateTransaction } from "./handlers";
 import { handleInputErrors } from "./middleware/validation";
 import { authenticate } from "./middleware/auth";
 
@@ -36,6 +36,11 @@ router.post(
   authenticate,
   initiateTransaction)
 
+
+router.put(
+  "/transactions/validate",
+  authenticate,
+  validateTransaction)
 // router.patch(
 //   "/user",
 //   body("handle").notEmpty().withMessage("El handle no puede ir vacio"),

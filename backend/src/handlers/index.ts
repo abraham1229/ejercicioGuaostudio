@@ -7,6 +7,7 @@ import { checkPassword, hashPassword } from "../utils/auth";
 import { generateJWT } from "./jwt";
 import cloudinary from "../config/cloudinary";
 import Transaction from "../models/Transaction";
+import jwt from "jsonwebtoken";
 
 //Se tiene any y se debe de evitar porque se puede usar el valor que sea
 export const createAccount = async (req: Request, res: Response) => {
@@ -97,6 +98,49 @@ export const initiateTransaction = async (req: Request, res: Response) => {
 
   res.send(token);
 };
+
+
+
+export const validateTransaction = async (req: Request, res: Response) => {
+  const transactionToken = req.header("x-transaction-token")
+  if (!transactionToken) {
+    const error = new Error("Falta token de transacción");
+    res.status(401).json({ error: error.message });
+    return;
+  }
+
+  try {
+      const result = jwt.verify(transactionToken, process.env.JWT_SECRET)
+    
+      if (typeof result === 'object' && result.id) {
+        const transaction = await Transaction.findById(result.id)
+        if (!transaction) {
+          const error = new Error('El usuario no existe');
+          res.status(404).json({ error: error.message });
+          return
+        }
+        if (transaction.status !== "pending") {
+          res.status(400).json({ error: "La transacción no está en estado pendiente"});
+          return
+        }
+
+        const recipient = await User.findById(transaction.recipient)
+
+        recipient.balance += transaction.amount
+        await recipient.save()
+
+        transaction.status = 'authorized'
+        await transaction.save()
+
+        res.send("Transacción validada correctamente")
+      }
+      
+    } catch (error) {
+      res.status(500).json({error: "Token no valido"})
+  }
+  
+}
+
 
 // export const updateProfile = async (req: Request, res: Response) => {
 //   try {
