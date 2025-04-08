@@ -91,10 +91,11 @@ export const initiateTransaction = async (req: Request, res: Response) => {
   await transaction.save();
   req.user.balance -= amount;
   await req.user.save();
-  res.status(201).end("Transacción inicializada correctamente");
 
+  //Se retorna el ID de la transaccion
+  const token = generateJWT({ id: transaction._id });
 
-
+  res.send(token);
 };
 
 // export const updateProfile = async (req: Request, res: Response) => {
