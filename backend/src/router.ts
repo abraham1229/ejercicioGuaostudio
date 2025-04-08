@@ -26,7 +26,8 @@ router.post(
   login
 );
 
-// router.get("/user", authenticate, getUser);
+router.get("/users/information", authenticate, getUser);
+
 // router.patch(
 //   "/user",
 //   body("handle").notEmpty().withMessage("El handle no puede ir vacio"),
