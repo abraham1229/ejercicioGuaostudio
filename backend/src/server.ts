@@ -16,7 +16,7 @@ app.use(cors(corsConfig))
 app.use(express.json())
 
 
-app.use('/',router) // Se toma desde /, lo que mapea cada peticion
+app.use('/api',router)
 
 
 export default app

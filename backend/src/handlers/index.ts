@@ -19,18 +19,8 @@ export const createAccount = async (req: Request, res: Response) => {
     return;
   }
 
-  //Comprobacion de handle
-  const handle = slug(req.body.handle, "");
-  const handleExists = await User.findOne({ handle });
-  if (handleExists) {
-    const error = new Error("Usuario no disponible");
-    res.status(409).json({ error: error.message });
-    return;
-  }
-
   const user = new User(req.body);
   user.password = await hashPassword(password);
-  user.handle = handle;
 
   await user.save();
   res.status(201).end("Registro creado correctamente");
@@ -65,55 +55,55 @@ export const getUser = async (req: Request, res: Response) => {
   res.json(req.user);
 };
 
-export const updateProfile = async (req: Request, res: Response) => {
-  try {
-    const { description, links } = req.body;
+// export const updateProfile = async (req: Request, res: Response) => {
+//   try {
+//     const { description, links } = req.body;
     
-    //Comprobacion de handle
-    const handle = slug(req.body.handle, "");
-    const handleExists = await User.findOne({ handle });
-    if (handleExists && handleExists.email !== req.user.email) {
-      const error = new Error("Usuario no disponible");
-      res.status(409).json({ error: error.message });
-      return;
-    }
-    //Actualizar usuario
-    req.user.handle = handle;
-    req.user.description = description;
-    req.user.links = links
+//     //Comprobacion de handle
+//     const handle = slug(req.body.handle, "");
+//     const handleExists = await User.findOne({ handle });
+//     if (handleExists && handleExists.email !== req.user.email) {
+//       const error = new Error("Usuario no disponible");
+//       res.status(409).json({ error: error.message });
+//       return;
+//     }
+//     //Actualizar usuario
+//     req.user.handle = handle;
+//     req.user.description = description;
+//     req.user.links = links
 
-    await req.user.save();
-    res.send("Perfil actualizado correctamente");
-  } catch (e) {
-    const error = new Error("Hubo un error");
-    res.status(500).json({ error: error.message });
-    return
-  }
-};
+//     await req.user.save();
+//     res.send("Perfil actualizado correctamente");
+//   } catch (e) {
+//     const error = new Error("Hubo un error");
+//     res.status(500).json({ error: error.message });
+//     return
+//   }
+// };
 
-export const uploadImage = async (req: Request, res: Response) => {
+// export const uploadImage = async (req: Request, res: Response) => {
 
-  const form = formidable({ multiples: false })
+//   const form = formidable({ multiples: false })
 
-  try {
-    form.parse(req, (error, fields, files) => {
-      console.log()
-      cloudinary.uploader.upload(files.file[0].filepath, {public_id: uuid()}, async function (error, result) {
-        if (error) {
-          const error = new Error("Hubo un error al subir la imagen");
-          res.status(500).json({ error: error.message });
-          return
-        }
-        if (result) {
-          req.user.image = result.secure_url
-          await req.user.save()
-          res.json({image: result.secure_url})
-        }
-      })
-    })
-  } catch (e) {
-    const error = new Error("Hubo un error");
-    res.status(500).json({ error: error.message });
-    return
-  }
-}
+//   try {
+//     form.parse(req, (error, fields, files) => {
+//       console.log()
+//       cloudinary.uploader.upload(files.file[0].filepath, {public_id: uuid()}, async function (error, result) {
+//         if (error) {
+//           const error = new Error("Hubo un error al subir la imagen");
+//           res.status(500).json({ error: error.message });
+//           return
+//         }
+//         if (result) {
+//           req.user.image = result.secure_url
+//           await req.user.save()
+//           res.json({image: result.secure_url})
+//         }
+//       })
+//     })
+//   } catch (e) {
+//     const error = new Error("Hubo un error");
+//     res.status(500).json({ error: error.message });
+//     return
+//   }
+// }
