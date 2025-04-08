@@ -18,13 +18,13 @@ router.post(
   createAccount
 );
 
-// router.post(
-//   "/auth/login",
-//   body("email").isEmail().withMessage("E-mail no válido"),
-//   body("password").notEmpty().withMessage("El password es obligatorio"),
-//   handleInputErrors,
-//   login
-// );
+router.post(
+  "/users/login",
+  body("email").isEmail().withMessage("E-mail no válido"),
+  body("password").notEmpty().withMessage("El password es obligatorio"),
+  handleInputErrors,
+  login
+);
 
 // router.get("/user", authenticate, getUser);
 // router.patch(

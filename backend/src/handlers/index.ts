@@ -28,7 +28,6 @@ export const createAccount = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   //Comprobacion de email (ver si esta registrado)
   const user = await User.findOne({ email }); //Returns the first
   if (!user) {
