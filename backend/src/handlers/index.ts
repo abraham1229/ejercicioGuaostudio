@@ -98,41 +98,33 @@ export const initiateTransaction = async (req: Request, res: Response) => {
 
 
 export const validateTransaction = async (req: Request, res: Response) => {
-  const transactionToken = req.header("x-transaction-token")
-  if (!transactionToken) {
-    const error = new Error("Falta token de transacción");
-    res.status(401).json({ error: error.message });
-    return;
+  
+  if (req.transaction.status !== "pending") {
+    res.status(400).json({ error: "La transacción no está en estado pendiente"});
+    return
   }
 
-  try {
-      const result = jwt.verify(transactionToken, process.env.JWT_SECRET)
-    
-      if (typeof result === 'object' && result.id) {
-        const transaction = await Transaction.findById(result.id)
-        if (!transaction) {
-          const error = new Error('El usuario no existe');
-          res.status(404).json({ error: error.message });
-          return
-        }
-        if (transaction.status !== "pending") {
-          res.status(400).json({ error: "La transacción no está en estado pendiente"});
-          return
-        }
+  req.transaction.status = 'authorized'
+  await req.transaction.save()
 
-        const recipient = await User.findById(transaction.recipient)
+  res.send("Transacción autorizada correctamente")
+}
 
-        recipient.balance += transaction.amount
-        await recipient.save()
-
-        transaction.status = 'authorized'
-        await transaction.save()
-
-        res.send("Transacción validada correctamente")
-      }
-      
-    } catch (error) {
-      res.status(500).json({error: "Token no valido"})
+export const finishTransaction = async (req: Request, res: Response) => {
+  
+  if (req.transaction.status !== "authorized") {
+    res.status(400).json({ error: "La transacción no está autorizada"});
+    return
   }
+
+  const recipient = await User.findById(req.transaction.recipient)
+
+  recipient.balance += req.transaction.amount
+  await recipient.save()
+
+  req.transaction.status = 'completed'
+  await req.transaction.save()
+
+  res.send("Transacción finalizada correctamente")
   
 }

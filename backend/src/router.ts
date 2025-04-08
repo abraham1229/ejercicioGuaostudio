@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createAccount, getUser, initiateTransaction, login, validateTransaction } from "./handlers";
+import { createAccount, finishTransaction, getUser, initiateTransaction, login, validateTransaction } from "./handlers";
 import { handleInputErrors } from "./middleware/validation";
-import { authenticate } from "./middleware/auth";
+import { authenticateUser } from "./middleware/authUser";
+import { authenticateTransaction } from "./middleware/authTransaction";
 
 //Routes creation
 const router = Router();
@@ -26,30 +27,29 @@ router.post(
   login
 );
 
-router.get("/users/information", authenticate, getUser);
+router.get("/users/information", authenticateUser, getUser);
 
 router.post(
   "/transactions/initiate",
   body("recipientEmail").isEmail().withMessage("El correo del destinatario es obligatorio"),
   body("amount").isFloat({ gt: 0 }).withMessage("El monto debe ser mayor a cero"),
   handleInputErrors,
-  authenticate,
+  authenticateUser,
   initiateTransaction)
 
 
 router.put(
   "/transactions/validate",
-  authenticate,
+  authenticateUser,
+  authenticateTransaction,
   validateTransaction)
-// router.patch(
-//   "/user",
-//   body("handle").notEmpty().withMessage("El handle no puede ir vacio"),
-//   body("description").notEmpty().withMessage("La descripcion no puede ir vacia"),
-//   handleInputErrors,
-//   authenticate,
-//   updateProfile
-// );
 
-// router.post('/user/image', authenticate, uploadImage)
+router.put(
+  "/transactions/complete",
+  authenticateUser,
+  authenticateTransaction,
+  finishTransaction)
+
+
 
 export default router;
