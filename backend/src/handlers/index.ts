@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid'
 import { checkPassword, hashPassword } from "../utils/auth";
 import { generateJWT } from "./jwt";
 import cloudinary from "../config/cloudinary";
+import Transaction from "../models/Transaction";
 
 //Se tiene any y se debe de evitar porque se puede usar el valor que sea
 export const createAccount = async (req: Request, res: Response) => {
@@ -52,6 +53,48 @@ export const login = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
   res.json(req.user);
+};
+
+export const initiateTransaction = async (req: Request, res: Response) => {
+  const { recipientEmail, amount, currency, metadata } = req.body;
+  
+  if (recipientEmail === req.user.email) {
+    const error = new Error("No se puede transferir a usted mismo");
+    res.status(404).json({ error: error.message });
+    return;
+  }
+
+  //Comprobacion de destinatario
+  const recipientUser  = await User.findOne({ email: recipientEmail }); 
+  if (!recipientUser ) {
+    const error = new Error("El usuario destino no existe");
+    res.status(404).json({ error: error.message });
+    return;
+  }
+
+  if (recipientUser.balance < amount) {
+    const error = new Error("Saldo insuficiente");
+    res.status(404).json({ error: error.message });
+    return;
+  }
+
+  //Se crea transaccion con el estado pending
+  const transaction = new Transaction({
+    sender: req.user._id,
+    recipient: recipientUser._id,
+    amount: amount,
+    currency: currency || "MXN",
+    status: "pending",
+    metadata: metadata || ""
+  })
+
+  await transaction.save();
+  req.user.balance -= amount;
+  await req.user.save();
+  res.status(201).end("Transacción inicializada correctamente");
+
+
+
 };
 
 // export const updateProfile = async (req: Request, res: Response) => {

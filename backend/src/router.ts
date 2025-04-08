@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createAccount, getUser, login } from "./handlers";
+import { createAccount, getUser, initiateTransaction, login } from "./handlers";
 import { handleInputErrors } from "./middleware/validation";
 import { authenticate } from "./middleware/auth";
 
@@ -27,6 +27,14 @@ router.post(
 );
 
 router.get("/users/information", authenticate, getUser);
+
+router.post(
+  "/transactions/initiate",
+  body("recipientEmail").isEmail().withMessage("El correo del destinatario es obligatorio"),
+  body("amount").isFloat({ gt: 0 }).withMessage("El monto debe ser mayor a cero"),
+  handleInputErrors,
+  authenticate,
+  initiateTransaction)
 
 // router.patch(
 //   "/user",
