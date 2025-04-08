@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createAccount, finishTransaction, getUser, initiateTransaction, login, validateTransaction } from "./handlers";
+import { createAccount, finishTransaction, getUser, initiateTransaction, login, transactionsHistory, validateTransaction } from "./handlers";
 import { handleInputErrors } from "./middleware/validation";
 import { authenticateUser } from "./middleware/authUser";
 import { authenticateTransaction } from "./middleware/authTransaction";
 
 //Routes creation
 const router = Router();
-// Autenticacion y registro
+
+
+// User
 router.post(
   "/users/register",
   body("username").notEmpty().withMessage("El nombre no puede ir vacio"),
@@ -29,6 +31,8 @@ router.post(
 
 router.get("/users/information", authenticateUser, getUser);
 
+
+//Transactions
 router.post(
   "/transactions/initiate",
   body("recipientEmail").isEmail().withMessage("El correo del destinatario es obligatorio"),
@@ -36,7 +40,6 @@ router.post(
   handleInputErrors,
   authenticateUser,
   initiateTransaction)
-
 
 router.put(
   "/transactions/validate",
@@ -50,6 +53,10 @@ router.put(
   authenticateTransaction,
   finishTransaction)
 
-
+router.get(
+  "/transactions/history",
+  authenticateUser,
+  transactionsHistory
+)
 
 export default router;

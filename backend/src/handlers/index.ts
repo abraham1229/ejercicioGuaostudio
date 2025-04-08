@@ -128,3 +128,28 @@ export const finishTransaction = async (req: Request, res: Response) => {
   res.send("Transacción finalizada correctamente")
   
 }
+
+
+export const transactionsHistory = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+
+    const transactions = await Transaction.find({
+      $or: [{ sender: userId }, { recipient: userId }],
+    })
+      .sort({ createdAt: -1 })
+      .populate('sender', 'username email')
+      .populate('recipient', 'username email');
+    
+    const numTransactions = transactions.length;
+
+    res.status(200).json({ 
+      message: "Historial de transacciones obtenido correctamente",
+      numTransactions,
+      transactions 
+    });
+  } catch (error) {
+    console.error("Error al obtener el historial de transacciones:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+}
