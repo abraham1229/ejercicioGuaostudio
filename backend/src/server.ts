@@ -1,4 +1,4 @@
-import express from "express"; //ESM (es la nueva version que sustituye require)
+import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import router from "./router";
@@ -9,7 +9,8 @@ if (process.env.NODE_ENV !== "test") {
   connectDB();
 }
 
-const app = express(); // Instancia del servidor
+// Instancia del servidor
+const app = express(); 
 
 //Cors
 app.use(cors(corsConfig));
@@ -17,6 +18,7 @@ app.use(cors(corsConfig));
 //Leer datos de formularios (es middleware global)
 app.use(express.json());
 
+//Iniciar ruta
 app.use("/api", router);
 
 export default app;
