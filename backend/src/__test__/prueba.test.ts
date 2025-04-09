@@ -27,9 +27,12 @@ const userTestLogin = {
 describe('Test de usuarios', () => { 
   describe('Registro de Usuario', () => {
     it('Debería crear un nuevo usuario y responder con 201 y mensaje de éxito', async () => {
+      const newUser = {...userTestCreate}
+
       const response = await request(app)
         .post('/api/users/register')
-        .send(userTestCreate);
+        .send(newUser);
+      
       console.log('Respuesta recibida en registro:', response.text);
       expect(response.status).toBe(201);
       expect(response.text).toEqual('Registro creado correctamente');

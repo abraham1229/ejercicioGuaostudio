@@ -57,7 +57,7 @@ export const initiateTransaction = async (req: Request, res: Response) => {
   
   if (recipientEmail === req.user.email) {
     const error = new Error("No se puede transferir a usted mismo");
-    res.status(404).json({ error: error.message });
+    res.status(400).json({ error: error.message });
     return;
   }
 
@@ -71,7 +71,7 @@ export const initiateTransaction = async (req: Request, res: Response) => {
 
   if (recipientUser.balance < amount) {
     const error = new Error("Saldo insuficiente");
-    res.status(404).json({ error: error.message });
+    res.status(400).json({ error: error.message });
     return;
   }
 
