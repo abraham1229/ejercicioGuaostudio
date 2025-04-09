@@ -28,7 +28,7 @@ export const authenticateTransaction = async (
     if (typeof result === "object" && result.id) {
       const transaction = await Transaction.findById(result.id);
       if (!transaction) {
-        const error = new Error("El usuario no existe");
+        const error = new Error("La transacción no existe");
         res.status(404).json({ error: error.message });
         return;
       }

@@ -91,7 +91,6 @@ describe('Test de usuarios', () => {
         .send(userTestLogin);
       
       jwtToken = response.text
-      console.log(jwtToken)
       expect(response.status).toBe(200);
     });
   });
