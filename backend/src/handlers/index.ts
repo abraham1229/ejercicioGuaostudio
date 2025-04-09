@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import Transaction from "../models/Transaction";
 import User from "../models/User";
 import { checkPassword, hashPassword } from "../utils/auth";
 import { generateJWT } from "./jwt";
 
-//Se tiene any y se debe de evitar porque se puede usar el valor que sea
 export const createAccount = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -54,7 +52,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const initiateTransaction = async (req: Request, res: Response) => {
   const { recipientEmail, amount, currency, metadata } = req.body;
-  
+
   if (recipientEmail === req.user.email) {
     const error = new Error("No se puede transferir a usted mismo");
     res.status(400).json({ error: error.message });
@@ -62,8 +60,8 @@ export const initiateTransaction = async (req: Request, res: Response) => {
   }
 
   //Comprobacion de destinatario
-  const recipientUser  = await User.findOne({ email: recipientEmail }); 
-  if (!recipientUser ) {
+  const recipientUser = await User.findOne({ email: recipientEmail });
+  if (!recipientUser) {
     const error = new Error("El usuario destino no existe");
     res.status(404).json({ error: error.message });
     return;
@@ -82,8 +80,8 @@ export const initiateTransaction = async (req: Request, res: Response) => {
     amount: amount,
     currency: currency || "MXN",
     status: "pending",
-    metadata: metadata || ""
-  })
+    metadata: metadata || "",
+  });
 
   await transaction.save();
   req.user.balance -= amount;
@@ -95,40 +93,38 @@ export const initiateTransaction = async (req: Request, res: Response) => {
   res.send(token);
 };
 
-
-
 export const validateTransaction = async (req: Request, res: Response) => {
-  
   if (req.transaction.status !== "pending") {
-    res.status(400).json({ error: "La transacción no está en estado pendiente"});
-    return
+    res
+      .status(400)
+      .json({ error: "La transacción no está en estado pendiente" });
+    return;
   }
 
-  req.transaction.status = 'authorized'
-  await req.transaction.save()
+  req.transaction.status = "authorized";
+  await req.transaction.save();
 
-  res.send("Transacción autorizada correctamente")
-}
+  res.send("Transacción autorizada correctamente");
+};
 
 export const finishTransaction = async (req: Request, res: Response) => {
-  
   if (req.transaction.status !== "authorized") {
-    res.status(400).json({ error: "La transacción no está autorizada o fue terminada"});
-    return
+    res
+      .status(400)
+      .json({ error: "La transacción no está autorizada o fue terminada" });
+    return;
   }
 
-  const recipient = await User.findById(req.transaction.recipient)
+  const recipient = await User.findById(req.transaction.recipient);
 
-  recipient.balance += req.transaction.amount
-  await recipient.save()
+  recipient.balance += req.transaction.amount;
+  await recipient.save();
 
-  req.transaction.status = 'completed'
-  await req.transaction.save()
+  req.transaction.status = "completed";
+  await req.transaction.save();
 
-  res.send("Transacción finalizada correctamente")
-  
-}
-
+  res.send("Transacción finalizada correctamente");
+};
 
 export const transactionsHistory = async (req: Request, res: Response) => {
   try {
@@ -138,18 +134,18 @@ export const transactionsHistory = async (req: Request, res: Response) => {
       $or: [{ sender: userId }, { recipient: userId }],
     })
       .sort({ createdAt: -1 })
-      .populate('sender', 'username email')
-      .populate('recipient', 'username email');
-    
+      .populate("sender", "username email")
+      .populate("recipient", "username email");
+
     const numTransactions = transactions.length;
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Historial de transacciones obtenido correctamente",
       numTransactions,
-      transactions 
+      transactions,
     });
   } catch (error) {
     console.error("Error al obtener el historial de transacciones:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
-}
+};
