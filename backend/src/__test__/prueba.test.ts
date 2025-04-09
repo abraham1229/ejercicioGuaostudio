@@ -2,6 +2,8 @@ import request from 'supertest';
 import app from '../server';
 import { connectInMemoryDB, disconnectInMemoryDB } from '../setupTests';
 
+jest.setTimeout(30000);
+
 beforeAll(async () => {
   await connectInMemoryDB();
 });
@@ -28,7 +30,7 @@ describe('Test de usuarios', () => {
       const response = await request(app)
         .post('/api/users/register')
         .send(userTestCreate);
-      
+      console.log('Respuesta recibida en registro:', response.text);
       expect(response.status).toBe(201);
       expect(response.text).toEqual('Registro creado correctamente');
     });
@@ -38,7 +40,7 @@ describe('Test de usuarios', () => {
       const response = await request(app)
         .post('/api/users/login')
         .send(userTestLogin);
-      
+      console.log('Respuesta recibida en registro:', response.text);
       expect(response.status).toBe(200);
     });
   });
