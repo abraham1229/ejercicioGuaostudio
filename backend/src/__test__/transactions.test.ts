@@ -199,4 +199,66 @@ describe('Test de transacciones', () => {
     });
   });
 
+  describe('Historial de transacción', () => {
+    // Sin token de usuario
+    it('Debería retornar 401 (usuario sin token)', async () => {
+      
+      const response = await request(app)
+        .get('/api/transactions/history')
+      
+      expect(response.status).toBe(401);
+      expect(response.body.error).toEqual('No autorizado');
+    });
+
+    // Token incorrecto
+    it('Debería retornar 404 (token incorrecto)', async () => {
+      
+      const response = await request(app)
+        .get('/api/transactions/history')
+        .set('Authorization', `Bearer ${jwtTokenTransaction}`)
+      
+      expect(response.status).toBe(404);
+      expect(response.body.error).toEqual('El usuario no existe');
+    });
+
+    // Historial con una transacción
+    it('Debería retornar 200 y el historial de transaccion)', async () => {
+      
+      const response = await request(app)
+        .get('/api/transactions/history')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+      
+      const numTransactions = response.body.transactions.length
+      expect(response.status).toBe(200);
+      expect(numTransactions).toBe(1)
+      expect(response.body.message).toEqual('Historial de transacciones obtenido correctamente');
+    });
+
+    // Historial con tres transacciones
+    it('Debería retornar 200 y el historial de transaccion)', async () => {
+
+
+      await request(app)
+        .post('/api/transactions/initiate')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .send(transactionTest);
+      
+      await request(app)
+        .post('/api/transactions/initiate')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .send(transactionTest);
+
+      
+      const response = await request(app)
+        .get('/api/transactions/history')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+      
+      const numTransactions = response.body.transactions.length
+      
+      expect(response.status).toBe(200);
+      expect(numTransactions).toBe(3)
+      expect(response.body.message).toEqual('Historial de transacciones obtenido correctamente');
+    });
+  });
+
 })
