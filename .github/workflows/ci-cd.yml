@@ -1,6 +1,10 @@
-name: Run Tests
+name: CI/CD Workflow
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
@@ -13,10 +17,19 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Cambia '16' por la versión requerida
+          node-version: '16'
       - name: Instalar dependencias en backend
         run: npm install
         working-directory: ./backend
       - name: Ejecutar Tests en backend
         run: npm test
         working-directory: ./backend
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy on Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
