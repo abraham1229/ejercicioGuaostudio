@@ -1,48 +1,52 @@
-import type { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
-import User, { IUser } from '../models/User'
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import User, { IUser } from "../models/User";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: IUser
+      user?: IUser;
     }
   }
 }
 
-export const authenticateUser = async (req:Request, res: Response, next: NextFunction) => {
-  const bearer = req.headers.authorization
+export const authenticateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const bearer = req.headers.authorization;
   // No se recibe bearer
   if (!bearer) {
-    const error = new Error('No autorizado')
-    res.status(401).json({ error: error.message })
-    return
+    const error = new Error("No autorizado");
+    res.status(401).json({ error: error.message });
+    return;
   }
 
-  const [, token] = bearer.split(' ')
-
+  const [, token] = bearer.split(" ");
 
   if (!token) {
-    const error = new Error('No autorizado')
-    res.status(401).json({ error: error.message })
-    return
+    const error = new Error("No autorizado");
+    res.status(401).json({ error: error.message });
+    return;
   }
-  
+
   try {
-    const result = jwt.verify(token, process.env.JWT_SECRET)
-    if (typeof result === 'object' && result.id) {
-      const user = await User.findById(result.id).select('_id username email balance')
+    const result = jwt.verify(token, process.env.JWT_SECRET);
+    if (typeof result === "object" && result.id) {
+      const user = await User.findById(result.id).select(
+        "_id username email balance"
+      );
       if (!user) {
-        const error = new Error('El usuario no existe')
-        res.status(404).json({ error: error.message })
-        return
+        const error = new Error("El usuario no existe");
+        res.status(404).json({ error: error.message });
+        return;
       }
-      
-      req.user = user
-      next()
+
+      req.user = user;
+      next();
     }
   } catch (error) {
-    res.status(500).json({error: "Token no valido"})
+    res.status(500).json({ error: "Token no valido" });
   }
-  
-}
+};

@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import Transaction, { ITransaction } from "../models/Transaction";
 
@@ -32,8 +32,8 @@ export const authenticateTransaction = async (
         res.status(404).json({ error: error.message });
         return;
       }
-      req.transaction = transaction
-      next()
+      req.transaction = transaction;
+      next();
     }
   } catch (error) {
     res.status(500).json({ error: "Token no valido" });
