@@ -1,6 +1,6 @@
 # API de Sistema de Pagos
 
-Este proyecto es un ejercicio técnico del proceso de selección en Guaostudio, cuyo objetivo es diseñar una API REST para un Sistema de Pagos.
+Este proyecto es un ejercicio técnico para el proceso de selección en Guaostudio, cuyo objetivo es diseñar una API REST para un Sistema de Pagos.
 
 ## Descripción
 
@@ -21,37 +21,36 @@ La API permite:
 
 ### Prerrequisitos
 
-- [Node.js](https://nodejs.org/) v12 o superior.
+- [Node.js](https://nodejs.org/) v16 o superior.
 - [Git](https://git-scm.com/) instalado.
 - Acceso a la base de datos configurada según la elección del desarrollador.
 
 ### Pasos de Instalación
 
 1. **Clonar el repositorio:**
-
-   **git clone <URL_DEL_REPOSITORIO>**  
-   **cd <NOMBRE_DEL_REPOSITORIO>**
-
+   ```bash
+   git clone git@github.com:abraham1229/ejercicioGuaostudio.git
+   cd ejercicioGuaostudio
+   cd backend
+    ```
 2. **Instalar dependencias:**
-
-   **npm install**
+   ```bash
+   npm install
+   ```
 
 3. **Configurar variables de entorno:**
 
-   - Renombrar el archivo **.env.example** a **.env**:
+   - Crear y/o editar archivo .env y poner
+     MONGO_URI = (URI para la conexion de su base de datos/nombrebase de datos)
+     JWT_SECRET = (palabra secreta deseada para hacer los JWT)
 
-     **cp .env.example .env**
-
-   - Editar el archivo **.env** para configurar los siguientes parámetros (por ejemplo, cadena de conexión a la base de datos, puerto, etc.):
-
-     **PORT=3000**  
-     **DB_URI=tu_cadena_de_conexion**  
-     **SECRET_KEY=tu_clave_secreta**
 
 4. **Iniciar la aplicación:**
 
-   **npm start**
-
+   ```bash
+   npm run dev
+   ```
+   
 ## Endpoints de la API
 
 ### Registrar Usuarios
@@ -94,9 +93,9 @@ La API permite:
 ## Pruebas Unitarias
 
 Para ejecutar las pruebas unitarias, utiliza el siguiente comando:
-
-**npm test**
-
+  ```bash
+    npm test
+  ```
 Las pruebas cubren:
 - Registro de usuarios.
 - Creación, validación y autorización de transacciones.
@@ -106,15 +105,10 @@ Las pruebas cubren:
 
 El proyecto cuenta con un pipeline de CI/CD para despliegue automático. Para configurarlo:
 
-- Conecta el repositorio a una herramienta de CI/CD (por ejemplo, GitHub Actions, Travis CI, CircleCI).
-- Verifica que los scripts de prueba y despliegue estén correctamente definidos en el archivo de configuración correspondiente (por ejemplo, **.github/workflows/ci.yml** para GitHub Actions).
+- Conecta el repositorio a una herramienta de CI/CD (en mi caso fue GitHub Actions).
+- Verifica que los scripts de prueba y despliegue estén correctamente definidos en el archivo de configuración correspondiente (por ejemplo, **.github/workflows/ci-cd.yml** para GitHub Actions).
 
-## Consideraciones Adicionales
-
-- **Validaciones y Seguridad:** Se aplican validaciones básicas. Se recomienda usar HTTPS en producción y otros mecanismos de seguridad adicionales.
-- **Estilo de Código:** Se sigue un code style uniforme (por ejemplo, mediante ESLint) para mantener la calidad del código.
-- **Buenas Prácticas:** Se aplican buenas prácticas en el manejo de errores, modularidad y documentación interna del código.
 
 ## Contacto
 
-Para dudas o sugerencias, por favor contacta a: [tu_email@ejemplo.com]
+Para dudas o sugerencias, por favor contacta a: [abrahamortizcastro1229@gmail.com]
