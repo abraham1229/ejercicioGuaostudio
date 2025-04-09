@@ -8,10 +8,15 @@ jobs:
     env:
       NODE_ENV: test
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      MONGO_URI_TEST: ${{ secrets.MONGO_URI_TEST }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install Dependencies
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Cambia '16' por la versión requerida
+      - name: Instalar dependencias en backend
         run: npm install
-      - name: Run Tests
+        working-directory: ./backend
+      - name: Ejecutar Tests en backend
         run: npm test
+        working-directory: ./backend
