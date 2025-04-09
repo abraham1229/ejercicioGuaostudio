@@ -108,7 +108,6 @@ describe('Test de transacciones', () => {
   });
 
   describe('Autorizar de transacción', () => {
-
     //  Sin token de transacción
     it('Debería retornar 401 (sin token de transacción)', async () => {
       
@@ -153,4 +152,51 @@ describe('Test de transacciones', () => {
       expect(response.body.error).toEqual('La transacción no está en estado pendiente');
     });
   });
+  
+  describe('Completar de transacción', () => {
+    //  Sin token de transacción
+    it('Debería retornar 401 (sin token de transacción)', async () => {
+      
+      const response = await request(app)
+        .put('/api/transactions/complete')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+      
+      expect(response.status).toBe(401);
+      expect(response.body.error).toEqual('Falta token de transacción');
+    });
+
+    //  Token de transacción equivocado
+    it('Debería retornar 404 (token de transacción equivocado)', async () => {
+      const response = await request(app)
+        .put('/api/transactions/complete')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .set('x-transaction-token', jwtTokenUser)
+      
+      expect(response.status).toBe(404);
+      expect(response.body.error).toEqual('La transacción no existe');
+    });
+
+    //  Happy
+    it('Debería finalizar la transacción y retornar un 200', async () => {
+      const response = await request(app)
+        .put('/api/transactions/complete')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .set('x-transaction-token', jwtTokenTransaction)
+      
+      expect(response.status).toBe(200);
+      expect(response.text).toEqual('Transacción finalizada correctamente');
+    });
+
+    //  Transacción no se encuentra pendiente
+    it('Debería retornar 400 (Transacción NO autorizada)', async () => {
+      const response = await request(app)
+        .put('/api/transactions/complete')
+        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .set('x-transaction-token', jwtTokenTransaction)
+      
+      expect(response.status).toBe(400);
+      expect(response.body.error).toEqual('La transacción no está autorizada o fue terminada');
+    });
+  });
+
 })

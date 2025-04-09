@@ -113,7 +113,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
 export const finishTransaction = async (req: Request, res: Response) => {
   
   if (req.transaction.status !== "authorized") {
-    res.status(400).json({ error: "La transacción no está autorizada"});
+    res.status(400).json({ error: "La transacción no está autorizada o fue terminada"});
     return
   }
 
