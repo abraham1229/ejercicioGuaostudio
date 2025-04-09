@@ -1,264 +1,262 @@
-import request from 'supertest';
-import app from '../server';
-import { connectInMemoryDB, disconnectInMemoryDB } from '../setupTests';
+import request from "supertest";
+import app from "../server";
+import { connectInMemoryDB, disconnectInMemoryDB } from "../setupTests";
 
 jest.setTimeout(30000);
 
 const userTestCreate1 = {
-  username: 'testuser1',
-  email: 'test1@example.com',
-  password: 'password123',
-  balance: 1000
-}; 
+  username: "testuser1",
+  email: "test1@example.com",
+  password: "password123",
+  balance: 1000,
+};
 
 const userTestCreate2 = {
-  username: 'testuser2',
-  email: 'test2@example.com',
-  password: 'password123'
-}; 
+  username: "testuser2",
+  email: "test2@example.com",
+  password: "password123",
+};
 
 const userTestLogin = {
-  email: 'test1@example.com',
-  password: 'password123'
+  email: "test1@example.com",
+  password: "password123",
 };
 
 const transactionTest = {
-  recipientEmail : "test2@example.com",
-  amount : 10.0
-}
+  recipientEmail: "test2@example.com",
+  amount: 10.0,
+};
 
 let jwtTokenUser: string;
 let jwtTokenTransaction: string;
 
 beforeAll(async () => {
   await connectInMemoryDB();
-  await request(app)
-    .post('/api/users/register')
-    .send(userTestCreate1);
+  await request(app).post("/api/users/register").send(userTestCreate1);
   const response = await request(app)
-    .post('/api/users/login')
+    .post("/api/users/login")
     .send(userTestLogin);
-  jwtTokenUser = response.text
-  
-  await request(app) 
-    .post('/api/users/register')
-    .send(userTestCreate2);
+  jwtTokenUser = response.text;
+
+  await request(app).post("/api/users/register").send(userTestCreate2);
 });
 
 afterAll(async () => {
   await disconnectInMemoryDB();
 });
 
-describe('Test de transacciones', () => { 
-  describe('Inicio de transacción', () => {
+describe("Test de transacciones", () => {
+  describe("Inicio de transacción", () => {
     //  Transferencia a el mismo
-    it('Debería retornar 400 (mismo correo)', async () => {
-      
-      const transactionTestSameEmail = { ...transactionTest, recipientEmail: 'test1@example.com'}
+    it("Debería retornar 400 (mismo correo)", async () => {
+      const transactionTestSameEmail = {
+        ...transactionTest,
+        recipientEmail: "test1@example.com",
+      };
 
       const response = await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
         .send(transactionTestSameEmail);
-      
+
       expect(response.status).toBe(400);
-      expect(response.body.error).toEqual('No se puede transferir a usted mismo');
+      expect(response.body.error).toEqual(
+        "No se puede transferir a usted mismo"
+      );
     });
 
     //  Transferencia a alguien que no existe
-    it('Debería retornar 404 (no existe destinatario)', async () => {
-      
-      const transactionTestSameEmail = { ...transactionTest, recipientEmail: 'test10@example.com'}
+    it("Debería retornar 404 (no existe destinatario)", async () => {
+      const transactionTestSameEmail = {
+        ...transactionTest,
+        recipientEmail: "test10@example.com",
+      };
 
       const response = await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
         .send(transactionTestSameEmail);
-      
+
       expect(response.status).toBe(404);
-      expect(response.body.error).toEqual('El usuario destino no existe');
+      expect(response.body.error).toEqual("El usuario destino no existe");
     });
 
     //  Saldo insuficiente
-    it('Debería retornar 400 (saldo insuficiente)', async () => {
-      
-      const transactionTestNoBalance = {...transactionTest, amount: 10000}
+    it("Debería retornar 400 (saldo insuficiente)", async () => {
+      const transactionTestNoBalance = { ...transactionTest, amount: 10000 };
 
       const response = await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
         .send(transactionTestNoBalance);
-      
+
       expect(response.status).toBe(400);
-      expect(response.body.error).toEqual('Saldo insuficiente');
+      expect(response.body.error).toEqual("Saldo insuficiente");
     });
 
     //  Happy
-    it('Debería crear nueva transacción y retornar 200', async () => {
-
+    it("Debería crear nueva transacción y retornar 200", async () => {
       const response = await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
         .send(transactionTest);
-      
-      jwtTokenTransaction = response.text
-      
+
+      jwtTokenTransaction = response.text;
+
       expect(response.status).toBe(200);
     });
   });
 
-  describe('Autorizar de transacción', () => {
+  describe("Autorizar de transacción", () => {
     //  Sin token de transacción
-    it('Debería retornar 401 (sin token de transacción)', async () => {
-      
+    it("Debería retornar 401 (sin token de transacción)", async () => {
       const response = await request(app)
-        .put('/api/transactions/validate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-      
+        .put("/api/transactions/validate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`);
+
       expect(response.status).toBe(401);
-      expect(response.body.error).toEqual('Falta token de transacción');
+      expect(response.body.error).toEqual("Falta token de transacción");
     });
 
     //  Token de transacción equivocado
-    it('Debería retornar 404 (token de transacción equivocado)', async () => {
+    it("Debería retornar 404 (token de transacción equivocado)", async () => {
       const response = await request(app)
-        .put('/api/transactions/validate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenUser)
-      
+        .put("/api/transactions/validate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenUser);
+
       expect(response.status).toBe(404);
-      expect(response.body.error).toEqual('La transacción no existe');
+      expect(response.body.error).toEqual("La transacción no existe");
     });
 
     //  Happy
-    it('Debería validar la transacción y retornar un 200', async () => {
+    it("Debería validar la transacción y retornar un 200", async () => {
       const response = await request(app)
-        .put('/api/transactions/validate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenTransaction)
-      
+        .put("/api/transactions/validate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenTransaction);
+
       expect(response.status).toBe(200);
-      expect(response.text).toEqual('Transacción autorizada correctamente');
+      expect(response.text).toEqual("Transacción autorizada correctamente");
     });
 
     //  Transacción no se encuentra pendiente
-    it('Debería retornar 400 (Transacción NO pendiente)', async () => {
+    it("Debería retornar 400 (Transacción NO pendiente)", async () => {
       const response = await request(app)
-        .put('/api/transactions/validate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenTransaction)
-      
+        .put("/api/transactions/validate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenTransaction);
+
       expect(response.status).toBe(400);
-      expect(response.body.error).toEqual('La transacción no está en estado pendiente');
+      expect(response.body.error).toEqual(
+        "La transacción no está en estado pendiente"
+      );
     });
   });
-  
-  describe('Completar de transacción', () => {
+
+  describe("Completar de transacción", () => {
     //  Sin token de transacción
-    it('Debería retornar 401 (sin token de transacción)', async () => {
-      
+    it("Debería retornar 401 (sin token de transacción)", async () => {
       const response = await request(app)
-        .put('/api/transactions/complete')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-      
+        .put("/api/transactions/complete")
+        .set("Authorization", `Bearer ${jwtTokenUser}`);
+
       expect(response.status).toBe(401);
-      expect(response.body.error).toEqual('Falta token de transacción');
+      expect(response.body.error).toEqual("Falta token de transacción");
     });
 
     //  Token de transacción equivocado
-    it('Debería retornar 404 (token de transacción equivocado)', async () => {
+    it("Debería retornar 404 (token de transacción equivocado)", async () => {
       const response = await request(app)
-        .put('/api/transactions/complete')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenUser)
-      
+        .put("/api/transactions/complete")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenUser);
+
       expect(response.status).toBe(404);
-      expect(response.body.error).toEqual('La transacción no existe');
+      expect(response.body.error).toEqual("La transacción no existe");
     });
 
     //  Happy
-    it('Debería finalizar la transacción y retornar un 200', async () => {
+    it("Debería finalizar la transacción y retornar un 200", async () => {
       const response = await request(app)
-        .put('/api/transactions/complete')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenTransaction)
-      
+        .put("/api/transactions/complete")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenTransaction);
+
       expect(response.status).toBe(200);
-      expect(response.text).toEqual('Transacción finalizada correctamente');
+      expect(response.text).toEqual("Transacción finalizada correctamente");
     });
 
     //  Transacción no se encuentra pendiente
-    it('Debería retornar 400 (Transacción NO autorizada)', async () => {
+    it("Debería retornar 400 (Transacción NO autorizada)", async () => {
       const response = await request(app)
-        .put('/api/transactions/complete')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .set('x-transaction-token', jwtTokenTransaction)
-      
+        .put("/api/transactions/complete")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .set("x-transaction-token", jwtTokenTransaction);
+
       expect(response.status).toBe(400);
-      expect(response.body.error).toEqual('La transacción no está autorizada o fue terminada');
+      expect(response.body.error).toEqual(
+        "La transacción no está autorizada o fue terminada"
+      );
     });
   });
 
-  describe('Historial de transacción', () => {
+  describe("Historial de transacción", () => {
     // Sin token de usuario
-    it('Debería retornar 401 (usuario sin token)', async () => {
-      
-      const response = await request(app)
-        .get('/api/transactions/history')
-      
+    it("Debería retornar 401 (usuario sin token)", async () => {
+      const response = await request(app).get("/api/transactions/history");
+
       expect(response.status).toBe(401);
-      expect(response.body.error).toEqual('No autorizado');
+      expect(response.body.error).toEqual("No autorizado");
     });
 
     // Token incorrecto
-    it('Debería retornar 404 (token incorrecto)', async () => {
-      
+    it("Debería retornar 404 (token incorrecto)", async () => {
       const response = await request(app)
-        .get('/api/transactions/history')
-        .set('Authorization', `Bearer ${jwtTokenTransaction}`)
-      
+        .get("/api/transactions/history")
+        .set("Authorization", `Bearer ${jwtTokenTransaction}`);
+
       expect(response.status).toBe(404);
-      expect(response.body.error).toEqual('El usuario no existe');
+      expect(response.body.error).toEqual("El usuario no existe");
     });
 
     // Historial con una transacción
-    it('Debería retornar 200 y el historial de transaccion)', async () => {
-      
+    it("Debería retornar 200 y el historial de transaccion)", async () => {
       const response = await request(app)
-        .get('/api/transactions/history')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-      
-      const numTransactions = response.body.transactions.length
+        .get("/api/transactions/history")
+        .set("Authorization", `Bearer ${jwtTokenUser}`);
+
+      const numTransactions = response.body.transactions.length;
       expect(response.status).toBe(200);
-      expect(numTransactions).toBe(1)
-      expect(response.body.message).toEqual('Historial de transacciones obtenido correctamente');
+      expect(numTransactions).toBe(1);
+      expect(response.body.message).toEqual(
+        "Historial de transacciones obtenido correctamente"
+      );
     });
 
     // Historial con tres transacciones
-    it('Debería retornar 200 y el historial de transaccion)', async () => {
-
-
+    it("Debería retornar 200 y el historial de transaccion)", async () => {
       await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-        .send(transactionTest);
-      
-      await request(app)
-        .post('/api/transactions/initiate')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
         .send(transactionTest);
 
-      
+      await request(app)
+        .post("/api/transactions/initiate")
+        .set("Authorization", `Bearer ${jwtTokenUser}`)
+        .send(transactionTest);
+
       const response = await request(app)
-        .get('/api/transactions/history')
-        .set('Authorization', `Bearer ${jwtTokenUser}`)
-      
-      const numTransactions = response.body.transactions.length
-      
+        .get("/api/transactions/history")
+        .set("Authorization", `Bearer ${jwtTokenUser}`);
+
+      const numTransactions = response.body.transactions.length;
+
       expect(response.status).toBe(200);
-      expect(numTransactions).toBe(3)
-      expect(response.body.message).toEqual('Historial de transacciones obtenido correctamente');
+      expect(numTransactions).toBe(3);
+      expect(response.body.message).toEqual(
+        "Historial de transacciones obtenido correctamente"
+      );
     });
   });
-
-})
+});
