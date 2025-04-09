@@ -1,13 +1,20 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createAccount, finishTransaction, getUser, initiateTransaction, login, transactionsHistory, validateTransaction } from "./handlers";
+import {
+  createAccount,
+  finishTransaction,
+  getUser,
+  initiateTransaction,
+  login,
+  transactionsHistory,
+  validateTransaction,
+} from "./handlers";
 import { handleInputErrors } from "./middleware/validation";
 import { authenticateUser } from "./middleware/authUser";
 import { authenticateTransaction } from "./middleware/authTransaction";
 
 //Routes creation
 const router = Router();
-
 
 // User
 router.post(
@@ -31,32 +38,34 @@ router.post(
 
 router.get("/users/information", authenticateUser, getUser);
 
-
 //Transactions
 router.post(
   "/transactions/initiate",
-  body("recipientEmail").isEmail().withMessage("El correo del destinatario es obligatorio"),
-  body("amount").isFloat({ gt: 0 }).withMessage("El monto debe ser mayor a cero"),
+  body("recipientEmail")
+    .isEmail()
+    .withMessage("El correo del destinatario es obligatorio"),
+  body("amount")
+    .isFloat({ gt: 0 })
+    .withMessage("El monto debe ser mayor a cero"),
   handleInputErrors,
   authenticateUser,
-  initiateTransaction)
+  initiateTransaction
+);
 
 router.put(
   "/transactions/validate",
   authenticateUser,
   authenticateTransaction,
-  validateTransaction)
+  validateTransaction
+);
 
 router.put(
   "/transactions/complete",
   authenticateUser,
   authenticateTransaction,
-  finishTransaction)
+  finishTransaction
+);
 
-router.get(
-  "/transactions/history",
-  authenticateUser,
-  transactionsHistory
-)
+router.get("/transactions/history", authenticateUser, transactionsHistory);
 
 export default router;
