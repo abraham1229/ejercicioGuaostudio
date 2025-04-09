@@ -5,7 +5,9 @@ import router from './router'
 import { connectDB } from './config/db'
 import { corsConfig } from './config/cors'
 
-connectDB()
+if (process.env.NODE_ENV !== 'test') {
+  connectDB()
+}
 
 const app = express(); // Instancia del servidor
 

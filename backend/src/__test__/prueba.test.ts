@@ -1,25 +1,28 @@
 import request from 'supertest';
-import app from '../server'; // Asegúrate de que la ruta sea correcta
-import { disconnectDB } from '../config/db';
+import app from '../server';
+import { connectInMemoryDB, disconnectInMemoryDB } from '../setupTests';
 
-describe('Registro de usuario', () => {
+beforeAll(async () => {
+  await connectInMemoryDB();
+});
 
-  afterAll(async () => {
-    await disconnectDB();
-  });
+afterAll(async () => {
+  await disconnectInMemoryDB();
+});
 
+describe('Registro de Usuario', () => {
   it('Debería crear un nuevo usuario y responder con 201 y mensaje de éxito', async () => {
     const newUser = {
-      username: "Rabi Soto",
-      email: "testuser1@example.com",
-      password: "password123"
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123'
     };
 
     const response = await request(app)
       .post('/api/users/register')
       .send(newUser);
     
-    expect(response.status).toEqual(201) 
-    expect(response.text).toEqual("Registro creado correctamente");
+    expect(response.status).toBe(201);
+    expect(response.text).toEqual('Registro creado correctamente');
   });
 });
