@@ -51,6 +51,116 @@ La API permite:
    ```bash
    npm run dev
    ```
+
+## Documentación de API
+
+Por favor tome en consideración que base_url en modo dev es http://localhost:4000. 
+Se recomienda usar postman para probar la funcionalidad de la api.
+
+### Endpoints de Usuario
+
+#### 1. Agregar Usuario
+- **Método:** POST  
+- **Endpoint:** {base_url}/api/users/register  
+- **Descripción:** Registra un nuevo usuario.
+- **Success:** 201 y mensaje descriptivo
+- **Error:** Status de error y mensaje descriptivo del error
+
+```json
+{
+    "username": "Luchi Reyna",
+    "email": "correo3092@correo.com",
+    "password": "password",
+    "balance": 150 Opcional (Default es 100)
+}
+```
+
+---
+
+#### 2. Identificar Usuario
+- **Método:** POST  
+- **Endpoint:** {base_url}/api/users/login  
+- **Descripción:** Autentica a un usuario y devuelve un token de acceso.
+- **Success:** 200 y JWT de id de usuario
+- **Error:** Status de error y mensaje descriptivo del error
+
+```json
+{
+    "email": "correo2@correo.com",
+    "password": "password"
+}
+```
+
+---
+
+#### 3. Obtener Datos del Usuario
+- **Método:** GET  
+- **Endpoint:** {base_url}/api/users/information  
+- **Requerimientos:**
+  - **Authorization:** Bearer Token JWT de usuario 
+- **Descripción:** Recupera la información del usuario autenticado.
+- **Success:** 200 e información de usuario puesto con el JWT
+- **Error:** Status de error y mensaje descriptivo del error
+
+---
+
+### Endpoints de Transacciones
+
+#### 4. Iniciar Transacción
+- **Método:** POST  
+- **Endpoint:** {base_url}/api/transactions/initiate  
+- **Requerimientos:**
+  - **Authorization:** Bearer Token JWT de usuario 
+- **Descripción:** Inicia una transacción especificando el correo del destinatario y el monto a transferir.
+- **Success:** 200 y JWT de id de transacción
+- **Error:** Status de error y mensaje descriptivo del error
+
+```json
+{
+    "recipientEmail": "correo29@correo.com",
+    "amount": 10.0,
+    "status" : "MXN" //Opcional (default es MXN),
+    "metadata" : "" //Opcional (default es "")
+}
+```
+
+---
+
+#### 5. Autorizar Transacción
+- **Método:** PUT  
+- **Endpoint:** {base_url}/api/transactions/validate  
+- **Requerimientos:**
+  - **Authorization:** Bearer Token JWT de usuario 
+  - **Request Header:** **x-transaction-token** (JWT de id de transacción)
+- **Descripción:** Valida y autoriza la transacción iniciada previamente.
+- **Success:** 200 y mensaje descriptivo
+- **Error:** Status de error y mensaje descriptivo del error
+
+---
+
+#### 6. Completar Transacción
+- **Método:** PUT  
+- **Endpoint:** {base_url}/api/transactions/complete  
+- **Requerimientos:**
+  - **Authorization:** Bearer Token JWT de usuario 
+  - **Request Header:** **x-transaction-token** (JWT de id de transacción)
+- **Descripción:** Finaliza una transacción autorizada.
+- **Success:** 200 y mensaje descriptivo
+- **Error:** Status de error y mensaje descriptivo del error
+
+---
+
+#### 7. Obtener Historial de Transacciones
+- **Método:** GET  
+- **Endpoint:** {base_url}/api/transactions/history  
+- **Requerimientos:**
+  - **Authorization:** Bearer Token JWT de usuario 
+- **Descripción:** Recupera el historial de transacciones del usuario autenticado.
+- **Success:** 200 e historial de transacciones del usuario
+- **Error:** Status de error y mensaje descriptivo del error
+
+---
+
    
 ## Pruebas Unitarias
 
