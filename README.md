@@ -40,10 +40,11 @@ La API permite:
 
 3. **Configurar variables de entorno:**
 
-   - Crear y/o editar archivo .env y poner
-     MONGO_URI = (URI para la conexion de su base de datos/nombrebase de datos)
-     JWT_SECRET = (palabra secreta deseada para hacer los JWT)
-
+   Crear y/o editar archivo .env y poner
+   ```
+   MONGO_URI = (URI para la conexion de su base de datos/nombrebase de datos)
+   JWT_SECRET = (palabra secreta deseada para hacer los JWT)  
+   ```
 
 4. **Iniciar la aplicación:**
 
