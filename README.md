@@ -51,45 +51,6 @@ La API permite:
    npm run dev
    ```
    
-## Endpoints de la API
-
-### Registrar Usuarios
-
-- **URL:** `/api/users/register`
-- **Método:** `POST`
-- **Descripción:** Registra un nuevo usuario.
-- **Cuerpo de la solicitud (JSON):**
-
-  **{"username": "nombre_usuario", "email": "usuario@example.com", "password": "contraseña"}**
-
-- **Respuestas:**
-  - **201:** Usuario registrado exitosamente.
-  - **400:** Error en los datos enviados.
-
-### Iniciar Transacción de Pago
-
-- **URL:** `/api/transactions`
-- **Método:** `POST`
-- **Descripción:** Inicia una nueva transacción de pago, validando que la transacción esté autorizada.
-- **Cuerpo de la solicitud (JSON):**
-
-  **{"userId": "id_del_usuario", "amount": 100.00, "paymentMethod": "tarjeta_credito"}**
-
-- **Respuestas:**
-  - **201:** Transacción iniciada y autorizada.
-  - **400 / 401:** Error en la validación o autorización.
-
-### Consultar Historial de Transacciones
-
-- **URL:** `/api/transactions/:userId`
-- **Método:** `GET`
-- **Descripción:** Consulta el historial de transacciones de un usuario.
-- **Parámetros:**
-  - **userId:** Identificador del usuario.
-- **Respuestas:**
-  - **200:** Devuelve un listado de transacciones.
-  - **404:** Usuario no encontrado o sin transacciones registradas.
-
 ## Pruebas Unitarias
 
 Para ejecutar las pruebas unitarias, utiliza el siguiente comando:
