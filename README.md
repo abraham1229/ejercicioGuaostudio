@@ -12,8 +12,8 @@ La API permite:
 
 ## Tecnologías Utilizadas
 
-- **Lenguaje y Framework:** Node.js con Express
-- **Base de datos:** MongoDB
+- **Lenguaje y Framework:** Node.js con Express.
+- **Base de datos:** MongoDB.
 - **Pruebas Unitarias:** Se han implementado pruebas básicas usando jest y supertest.
 - **CI/CD:** Configuración para despliegue automático mediante Github Actions.
 
