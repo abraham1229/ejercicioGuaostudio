@@ -1,3 +1,196 @@
+# Payment System API
+
+This project is a technical exercise for the selection process at Guaostudio, aiming to design a REST API for a Payment System.
+
+## Description
+
+The API allows:
+
+- **Registering new users:** Enables creation of new users.
+- **Performing transactions:** Transactions must be initiated, validated, and completed. If the order is not respected, an error is thrown for security reasons.
+- **Viewing transaction history:** Allows users to review their past transactions.
+
+## Technologies Used
+
+- **Language & Framework:** Node.js with Express.
+- **Database:** MongoDB.
+- **Unit/Integration Testing:** Basic tests implemented using Jest and Supertest.
+- **CI/CD:** Configured for automatic deployment via GitHub Actions.
+
+## Installation & Setup
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v16 or higher.
+- [Git](https://git-scm.com/) installed.
+- Access to a configured database.
+
+### Installation Steps
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone git@github.com:abraham1229/ejercicioGuaostudio.git
+   cd ejercicioGuaostudio
+   cd backend
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set environment variables:**
+
+   Create or edit the .env file and add:
+
+   ```bash
+   MONGO_URI=(Your MongoDB connection URI)
+   JWT_SECRET=(Your desired secret word for JWT)
+   ```
+
+4. **Start the application:**
+
+   ```bash
+   npm run dev
+   ```
+
+## API Documentation
+
+Please note that the `base_url` in dev mode is `http://localhost:4000`.  
+It is recommended to use Postman to test the API functionality.
+
+### User Endpoints
+
+#### 1. Register User
+- **Method:** POST  
+- **Endpoint:** {base_url}/api/users/register  
+- **Description:** Registers a new user.
+- **Success:** 201 and a descriptive message  
+- **Error:** Error status and descriptive error message
+
+```json
+{
+  "username": "Lucy Reyna",
+  "email": "correo3092@correo.com",
+  "password": "password",
+  "balance": 150 // Optional (default is 100)
+}
+```
+
+---
+
+#### 2. Login User
+- **Method:** POST  
+- **Endpoint:** {base_url}/api/users/login  
+- **Description:** Authenticates a user and returns an access token.
+- **Success:** 200 and a JWT containing user ID  
+- **Error:** Error status and descriptive error message
+
+```json
+{
+  "email": "correo2@correo.com",
+  "password": "password"
+}
+```
+
+---
+
+#### 3. Get User Info
+- **Method:** GET  
+- **Endpoint:** {base_url}/api/users/information  
+- **Requirements:**
+  - **Authorization:** Bearer user JWT token
+- **Description:** Retrieves authenticated user information.
+- **Success:** 200 and user info  
+- **Error:** Error status and descriptive error message
+
+---
+
+### Transaction Endpoints
+
+#### 4. Initiate Transaction
+- **Method:** POST  
+- **Endpoint:** {base_url}/api/transactions/initiate  
+- **Requirements:**
+  - **Authorization:** Bearer user JWT token
+- **Description:** Starts a transaction by specifying recipient's email and transfer amount.
+- **Success:** 200 and a transaction JWT  
+- **Error:** Error status and descriptive error message
+
+```json
+{
+  "recipientEmail": "correo29@correo.com",
+  "amount": 10.0,
+  "status": "MXN", // Optional (default is MXN)
+  "metadata": ""   // Optional (default is empty)
+}
+```
+
+---
+
+#### 5. Validate Transaction
+- **Method:** PUT  
+- **Endpoint:** {base_url}/api/transactions/validate  
+- **Requirements:**
+  - **Authorization:** Bearer user JWT token  
+  - **Request Header:** **x-transaction-token** (transaction JWT)
+- **Description:** Validates and authorizes a previously initiated transaction.
+- **Success:** 200 and a descriptive message  
+- **Error:** Error status and descriptive error message
+
+---
+
+#### 6. Complete Transaction
+- **Method:** PUT  
+- **Endpoint:** {base_url}/api/transactions/complete  
+- **Requirements:**
+  - **Authorization:** Bearer user JWT token  
+  - **Request Header:** **x-transaction-token** (transaction JWT)
+- **Description:** Completes a validated transaction.
+- **Success:** 200 and a descriptive message  
+- **Error:** Error status and descriptive error message
+
+---
+
+#### 7. Get Transaction History
+- **Method:** GET  
+- **Endpoint:** {base_url}/api/transactions/history  
+- **Requirements:**
+  - **Authorization:** Bearer user JWT token
+- **Description:** Retrieves the transaction history of the authenticated user.
+- **Success:** 200 and transaction history  
+- **Error:** Error status and descriptive error message
+
+---
+
+## Unit/Integration Testing
+
+To run unit/integration tests, use the following command:
+
+```bash
+npm test
+```
+
+The tests cover:
+- User registration.
+- Transaction creation, validation, and completion.
+- Transaction history retrieval.
+
+## Deployment & CI/CD
+
+The project includes a CI/CD pipeline for automatic deployment. To configure it:
+
+- Connect the repository to a CI/CD tool (e.g., GitHub Actions).
+- Ensure the test and deployment scripts are properly defined in the configuration file (e.g., **.github/workflows/ci-cd.yml** for GitHub Actions).
+
+## Contact
+
+For questions or suggestions, feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/abrahamortizcastro/)
+
+<!--
+
 # API de Sistema de Pagos
 
 Este proyecto es un ejercicio técnico para el proceso de selección en Guaostudio, cuyo objetivo es diseñar una API REST para un Sistema de Pagos.
@@ -184,3 +377,4 @@ El proyecto cuenta con un pipeline de CI/CD para despliegue automático. Para co
 ## Contacto
 
 Para dudas o sugerencias, por favor contacta a: [abrahamortizcastro1229@gmail.com]
+-->
